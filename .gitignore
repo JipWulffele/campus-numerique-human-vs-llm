@@ -14,3 +14,8 @@ data/words10.csv
 
 # lock files
 uv.lock
+
+# models
+models/*
+*.bin
+*.bin.gz
