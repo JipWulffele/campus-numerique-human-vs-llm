@@ -1,5 +1,8 @@
 import streamlit as st
 
+# Set wide layout
+st.set_page_config(layout="wide")
+
 # 1. Define the pages
 home_page = st.Page("views/home.py", title="Home", icon=":material/home:", default=True)
 creativity_page = st.Page("views/creativity.py", title="Creativity", icon=":material/bar_chart:")
