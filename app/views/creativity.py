@@ -31,7 +31,7 @@ df_cosine = pd.read_csv('./data/cosine_similairity_neigbor.csv', index_col=0)
 
 st.subheader("Bigger == better ?")
 st.markdown("""
-    Diversity can be quantified by calculating the average cosine similairty. But **pay attention** what embedding model you use because most models are trained on sentences, not individual words and models can have different performances in different languages.
+    Diversity can be quantified by calculating the average cosine similairty (lower is better). But **pay attention** what embedding model you use because most models are trained on sentences, not individual words and models can have different performances in different languages.
     """)
 
 # Column layout for box plots-------------------------------------------------------------
