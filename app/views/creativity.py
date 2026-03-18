@@ -33,6 +33,11 @@ with col3:
         index=0  # default = first
     )
 
+    color_option = st.radio(
+        "Color by:",
+        ["Country", "Size"]
+    )
+
 # Filter data -----------------------------------------------------------------------
 df_filtered = df_cosine[df_cosine["embedding_model"] == selected_embedding].copy()
 
@@ -60,15 +65,33 @@ model_order_fr = (
 
 # Set up colors----------------------------------------------
 df_fr = df_fr.fillna("N/A")
-color_map = {
-    "N/A": "#54478C",        # grey (humans)
-    "US": "#EFEA5A",         # blue
-    "France": "#f29e4c",      # red
-    "China": "#F1C453",       # purple
+color_map_country = {
+    "N/A": "#54478C",        
+    "US": "#EFEA5A",        
+    "China": "#F1C453", 
+    "France": "#f29e4c",       
 }
+color_map_size = {
+    "N/A": "#54478C",       
+    "S": "#b9e769",         
+    "M": "#efea5a",     
+    "L": "#f1c453",
+    "XL": "#f29e4c"     
+}
+
+if color_option == "Country":
+    color_col = "country"
+    color_map = color_map_country
+else:
+    color_col = "size"
+    color_map = color_map_size
 
 y_min = df_filtered["avg_cosine"].min()
 y_max = df_filtered["avg_cosine"].max()
+
+category_orders = {
+    color_col: list(color_map.keys())
+}
 
 # Plot English ----------------------------------------------------------------------
 with col1:
@@ -78,8 +101,11 @@ with col1:
         df_en,
         x="model",
         y="avg_cosine",
-        color="country",
-        category_orders={"model": list(model_order_en)},
+        color=color_col,
+        category_orders={
+            "model": list(model_order_en),
+            color_col: list(color_map.keys())  # 👈 force legend order
+        },
         color_discrete_map=color_map
     )
     fig_en.update_traces(width=0.6)
@@ -97,8 +123,11 @@ with col2:
         df_fr,
         x="model",
         y="avg_cosine",
-        color="country",
-        category_orders={"model": list(model_order_fr)},
+        color=color_col,
+        category_orders={
+            "model": list(model_order_fr),
+            color_col: list(color_map.keys())  # 👈 force legend order
+        },
         color_discrete_map=color_map
     )
     fig_fr.update_traces(width=0.6)
@@ -125,8 +154,11 @@ with col1:
         df_fr,
         x="model",
         y="cosine_difference",
-        color="country",
-        category_orders={"model": list(model_order_fr)},
+        color=color_col,
+        category_orders={
+            "model": list(model_order_fr),
+            color_col: list(color_map.keys())  # 👈 force legend order
+        },
         color_discrete_map=color_map
     )
     fig_en.update_traces(width=0.6)
