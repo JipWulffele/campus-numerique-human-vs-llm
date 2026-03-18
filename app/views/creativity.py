@@ -1,15 +1,26 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from PIL import Image
 
-st.title('Creative LLMs')
+st.title('(not so) Creative LLMs')
 
+
+################################################
+### Wordclouds
+################################################
+
+image = Image.open("./data/wordclouds.png")
+st.image(image, caption="LLM vs Human Word Clouds")
+
+################################################
+### Boxplots
+################################################
 
 # Load data-------------------------------------------------------------------------
 df_cosine = pd.read_csv('./data/cosine_similairity.csv')
 
-
-# Column layout-------------------------------------------------------------
+# Column layout for box plots-------------------------------------------------------------
 col1, col2, col3 = st.columns([2, 2, 1])
 
 # Sidebar / selector (col3) ---------------------------------------------------------
@@ -50,10 +61,10 @@ model_order_fr = (
 # Set up colors----------------------------------------------
 df_fr = df_fr.fillna("N/A")
 color_map = {
-    "N/A": "#A0A0A0",        # grey (humans)
-    "US": "#5f0f40",         # blue
-    "France": "#fb8b24",      # red
-    "China": "#0f4c5c",       # purple
+    "N/A": "#54478C",        # grey (humans)
+    "US": "#EFEA5A",         # blue
+    "France": "#f29e4c",      # red
+    "China": "#F1C453",       # purple
 }
 
 y_min = df_filtered["avg_cosine"].min()
@@ -73,6 +84,8 @@ with col1:
     )
     fig_en.update_traces(width=0.6)
     fig_en.update_yaxes(range=[y_min, y_max])
+    fig_en.update_layout(xaxis_title=None)
+    fig_en.update_yaxes(title="Average cosine similarity")
 
     st.plotly_chart(fig_en, use_container_width=True)
 
@@ -90,5 +103,13 @@ with col2:
     )
     fig_fr.update_traces(width=0.6)
     fig_fr.update_yaxes(range=[y_min, y_max])
+    fig_fr.update_layout(xaxis_title=None)
+    fig_fr.update_yaxes(title="Average cosine similarity")
 
     st.plotly_chart(fig_fr, use_container_width=True)
+
+################################################
+### Neighborhood bias
+################################################
+
+# Are words next to each other more similair than the average score ?
