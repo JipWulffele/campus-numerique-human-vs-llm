@@ -18,7 +18,7 @@ st.image(image, caption="LLM vs Human Word Clouds")
 ################################################
 
 # Load data-------------------------------------------------------------------------
-df_cosine = pd.read_csv('./data/cosine_similairity.csv')
+df_cosine = pd.read_csv('./data/cosine_similairity_neigbor.csv', index_col=0)
 
 # Column layout for box plots-------------------------------------------------------------
 col1, col2, col3 = st.columns([2, 2, 1])
@@ -112,4 +112,25 @@ with col2:
 ### Neighborhood bias
 ################################################
 
-# Are words next to each other more similair than the average score ?
+# Column layout for box plots-------------------------------------------------------------
+col1, col2 = st.columns([4, 1])
+
+df_fr["cosine_difference"] = df_fr["avg_cosine"] -  df_fr["avg_neighbor_cosine"]
+
+# Plot English ----------------------------------------------------------------------
+with col1:
+    st.subheader("Neighborhood bias")
+
+    fig_en = px.box(
+        df_fr,
+        x="model",
+        y="cosine_difference",
+        color="country",
+        category_orders={"model": list(model_order_fr)},
+        color_discrete_map=color_map
+    )
+    fig_en.update_traces(width=0.6)
+    fig_en.update_layout(xaxis_title=None)
+    fig_en.update_yaxes(title="Difference in cosine similarity")
+
+    st.plotly_chart(fig_en, use_container_width=True)
