@@ -16,6 +16,8 @@ data/words10.csv
 uv.lock
 
 # models
-models/*
+*.vec
+*.kv
+*.npy
 *.bin
 *.bin.gz
