@@ -161,7 +161,7 @@ st.markdown("")
 # Column layout for box plots-------------------------------------------------------------
 col1, col2 = st.columns([4, 1])
 
-df_fr["cosine_difference"] = df_fr["avg_cosine"] -  df_fr["avg_neighbor_cosine"]
+df_fr["cosine_difference"] = df_fr["avg_neighbor_cosine"] - df_fr["avg_cosine"]
 
 # Plot English ----------------------------------------------------------------------
 with col1:
