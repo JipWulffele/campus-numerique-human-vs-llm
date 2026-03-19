@@ -155,13 +155,18 @@ if user_input:
         pct_ai = percentile_rank(user_score, df_ai_grouped["score"])
 
         # Calculate cosine similairity
-        model_en = KeyedVectors.load("./models/wiki.multi.en.kv", mmap='r')
-        model_fr = KeyedVectors.load("./models/wiki.multi.fr.kv", mmap='r')
+        try :
+            model_en = KeyedVectors.load("./models/wiki.multi.en.kv", mmap='r')
+            model_fr = KeyedVectors.load("./models/wiki.multi.fr.kv", mmap='r')
 
-        vector_list = [get_embedding(word, language) for word in words]
-        cosine_score = calculate_avg_cosine(vector_list)
-        cosine_scaled = scale_score(cosine_score)
-        ranking_llm, ranking_human = get_ranking(cosine_score)
+            vector_list = [get_embedding(word, language) for word in words]
+            cosine_score = calculate_avg_cosine(vector_list)
+            cosine_scaled = scale_score(cosine_score)
+            ranking_llm, ranking_human = get_ranking(cosine_score)
+        except : 
+            print("Embeddings model not available !!!")
+            cosine_scaled = None
+            ranking_llm, ranking_human = None, None
 
         if pct_ai > 50 : 
             st.success(f"""
@@ -179,7 +184,7 @@ if user_input:
             🧑 Meilleur que **{pct_humans:.1f}% des humains**
             """)
 
-        if ranking_llm > 50 : 
+        if ranking_llm and ranking_llm > 50 : 
             st.success(f"""
             🎯 Ton score de creativité : **{cosine_scaled}/10**
 
@@ -188,10 +193,15 @@ if user_input:
 
             """)
             st.balloons()
-        else: 
+        elif ranking_llm: 
             st.error(f"""
             🎯 Ton score de creativité : **{cosine_scaled}/10**
 
             🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
             🧑 Meilleur que **{ranking_human:.1f}% des humains**
+            """)
+        else: 
+            st.warning(f"""
+            Creativity score not available.\n
+            Please download embedding models as explained in the README.
             """)
