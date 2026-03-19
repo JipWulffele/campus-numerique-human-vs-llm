@@ -78,8 +78,8 @@ conso = pd.read_csv("data/model-energy-2_11_2026.csv")
 
 df_scores = df_scores.merge(conso, left_on="modele", right_on="id_model_culture", how="left")
 llm_human_score = llm_human_score.merge(conso, left_on="Model", right_on="id_model_culture", how="left")
-df_scores["consumption_mWh_1000tokens"] = df_scores["consumption_mWh_1000tokens"].astype(float)
-llm_human_score["consumption_mWh_1000tokens"] = llm_human_score["consumption_mWh_1000tokens"].astype(float)
+df_scores["Consumption_mWh_1000_tokens"] = df_scores["Consumption_mWh_1000_tokens"].astype(float)
+llm_human_score["Consumption_mWh_1000_tokens"] = llm_human_score["Consumption_mWh_1000_tokens"].astype(float)
 
 # --------------------------------------------------
 # 🟦 1. BAR PLOTS (3 on same row)
@@ -90,42 +90,42 @@ st.caption("Les modèles sont triés par consommation énergétique croissante. 
 
 avg_scores_1 = (
     df_scores
-    .groupby(["modele","consumption_mWh_1000tokens", "size"])[["bert_score_f1"]]
+    .groupby(["modele","Consumption_mWh_1000_tokens", "Size"])[["bert_score_f1"]]
     .mean()
     .round(4)
     .reset_index()
 )
 avg_scores_1['label'] = avg_scores_1.apply(
-    lambda row: f"{row['modele']}<br>{row['consumption_mWh_1000tokens']:.2f}<br>{row['size']}",
+    lambda row: f"{row['modele']}<br>{row['Consumption_mWh_1000_tokens']:.2f}<br>{row['Size']}",
     axis=1
 )
 
 avg_scores_2 = (
     llm_human_score
-    .groupby(["Model","consumption_mWh_1000tokens", "size"])[["Judge_Total"]]
+    .groupby(["Model","Consumption_mWh_1000_tokens", "Size"])[["Judge_Total"]]
     .mean()
     .round(4)
     .reset_index()
 )
 avg_scores_2['label'] = avg_scores_2.apply(
-    lambda row: f"{row['Model']}<br>{row['consumption_mWh_1000tokens']:.2f}<br>{row['size']}",
+    lambda row: f"{row['Model']}<br>{row['Consumption_mWh_1000_tokens']:.2f}<br>{row['Size']}",
     axis=1
 )
 
 avg_scores_3 = (
     llm_human_score
-    .groupby(["Model","consumption_mWh_1000tokens", "size"])[["Human_Correct"]]
+    .groupby(["Model","Consumption_mWh_1000_tokens", "Size"])[["Human_Correct"]]
     .mean()
     .round(4)
     .reset_index()
 )
 avg_scores_3['label'] = avg_scores_3.apply(
-    lambda row: f"{row['Model']}<br>{row['consumption_mWh_1000tokens']:.2f}<br>{row['size']}",
+    lambda row: f"{row['Model']}<br>{row['Consumption_mWh_1000_tokens']:.2f}<br>{row['Size']}",
     axis=1
 )
 
 fig1 = px.bar(
-    avg_scores_1.sort_values(by="consumption_mWh_1000tokens", ascending=True),
+    avg_scores_1.sort_values(by="Consumption_mWh_1000_tokens", ascending=True),
     x='label', y='bert_score_f1',
     title="BERTScore F1 moyen"
 )
@@ -139,7 +139,7 @@ fig1.add_annotation(
 )
 
 fig2 = px.bar(
-    avg_scores_2.sort_values(by="consumption_mWh_1000tokens", ascending=True),
+    avg_scores_2.sort_values(by="Consumption_mWh_1000_tokens", ascending=True),
     x='label', y='Judge_Total',
     title="LLM-as-Judge — Score moyen /7"
 )
@@ -147,7 +147,7 @@ fig2.update_layout(xaxis_title="Modèle", yaxis_title="Score moyen /7", height=5
 fig2.update_coloraxes(showscale=False)
 
 fig3 = px.bar(
-    avg_scores_3.sort_values(by="consumption_mWh_1000tokens", ascending=True),
+    avg_scores_3.sort_values(by="Consumption_mWh_1000_tokens", ascending=True),
     x='label', y='Human_Correct',
     title="Jugement humain — Taux de réponses correctes"
 )
