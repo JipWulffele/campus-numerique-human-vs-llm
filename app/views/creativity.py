@@ -31,7 +31,9 @@ df_cosine = pd.read_csv('./data/cosine_similairity_neigbor.csv', index_col=0)
 
 st.subheader("Bigger == better ?")
 st.markdown("""
-    Diversity can be quantified by calculating the average cosine similairty (lower is better). But **pay attention** what embedding model you use because most models are trained on sentences, not individual words and models can have different performances in different languages.
+    Are bigger more creative than smaller models ? And are models equally creative in english and french ? 
+    - **Attention** a lower cosine score equals higher creativity.
+    - **Pay attention** what embedding model you use because most models are trained on sentences, not individual words and models can have different performances in different languages.
     """)
 
 # Column layout for box plots-------------------------------------------------------------
@@ -163,6 +165,7 @@ df_fr["cosine_difference"] = df_fr["avg_neighbor_cosine"] - df_fr["avg_cosine"]
 # Plot English ----------------------------------------------------------------------
 with col1:
     st.subheader("Neighborhood bias")
+    st.markdown("Do LLMs suffer from neigbouhood bias in the same way as humans ?")
     st.image("./data/neirborhood.png")
 
     fig_en = px.box(
