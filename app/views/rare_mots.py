@@ -107,11 +107,6 @@ def words_to_df(words, language="french"):
 animate = st.checkbox("Activer animation de la variation de la limite")
 
 if animate:
-
-    # Choix langue pour visualisation
-    language_options = ["english", "french", "both"]
-    selected_language = st.selectbox("Filtrer par langue :", language_options, index=2)  # 'both' par défaut
-
     # limites pour animation : 100 à 10000 par pas de 100
     animation_limits = list(range(100, 10001, 100))
    
@@ -139,36 +134,26 @@ if animate:
         dfs.append(df_tmp)
     df_anim = pd.concat(dfs, ignore_index=True)
     
-    # Filtrer selon la langue
-    if selected_language != "both":
-        df_anim = df_anim[df_anim['language'] == selected_language]
-
     df_anim_plot = (
         df_anim
         .groupby(['model', 'score', 'language', 'limit'], as_index=False)
         .size()
         .rename(columns={'size': 'count'})
     )
-    # df_anim_plot['id'] = df_anim_plot.index.astype(str)
+ 
     df_anim_plot['id'] = df_anim_plot['model'] + '_' + df_anim_plot['score'].astype(str) + '_' + df_anim_plot['language']
     
     # pour corriger post aggregation l'ordre
     df_anim_plot['limit'] = df_anim_plot['limit'].astype(int)
     df_anim_plot = df_anim_plot.sort_values('limit').reset_index(drop=True)
-
-    # Décalage pour both
-    if selected_language == "both":
         
-        df_anim_plot['model_num'] = df_anim_plot['model'].astype('category').cat.codes
-        offset_map = {'english': -0.15, 'french': 0.15}
-        df_anim_plot['x_offset'] = df_anim_plot['model_num'] + df_anim_plot['language'].map(offset_map)
-        x_col = 'x_offset'
-        tickvals = df_anim_plot['model_num'].unique()
-        ticktext = df_anim_plot['model'].unique()
-    else:
-        x_col = 'model'
-        tickvals = None
-        ticktext = None
+    df_anim_plot['model_num'] = df_anim_plot['model'].astype('category').cat.codes
+    offset_map = {'english': -0.15, 'french': 0.15}
+    df_anim_plot['x_offset'] = df_anim_plot['model_num'] + df_anim_plot['language'].map(offset_map)
+    x_col = 'x_offset'
+    tickvals = df_anim_plot['model_num'].unique()
+    ticktext = df_anim_plot['model'].unique()
+
     
     fig = px.scatter(
         df_anim_plot,
