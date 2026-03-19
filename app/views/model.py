@@ -23,7 +23,7 @@ Compare Large Language Models based on:
 👉 Goal: identify the **most efficient models (high score, low energy)**.
 """)
 st.markdown("""Informations extract from:
-* 🧠 https://comparia.beta.gouv.fr/ranking
+* 🧠 https://comparia.beta.gouv.fr/#ranking
 * ⚡ https://ecologits.ai/latest/""")
 
 
