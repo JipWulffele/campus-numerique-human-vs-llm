@@ -1,8 +1,11 @@
 import pandas as pd
 from unidecode import unidecode
 import streamlit as st
+from gensim.models import KeyedVectors
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
-from views.rare_mots import prepare_lexicons, compute_scores_all, compute_word_scores, clean_words, words_to_df
+from views.rare_mots import compute_word_scores, clean_words, words_to_df
 
 #-------------------------------------------------------
 # load dictionnary
@@ -65,10 +68,10 @@ selected_difficulty = st.selectbox(
 # récupérer la limite associée
 selected_limit = difficulty_map[selected_difficulty]
 
-#Choix langue
+# Choix langue
 is_english = st.checkbox("Anglais 🇬🇧")
 
-#Choix 10 mots
+# Choix 10 mots
 user_input = st.text_input(
     "Entrez 10 mots séparés par des espaces :",
     placeholder="ex: chat chien maison voiture arbre ..."
@@ -76,6 +79,45 @@ user_input = st.text_input(
 
 language = "english" if is_english else "french"
 
+#-------------------------------------------------------
+# Functions for cosine similairity
+#-------------------------------------------------------
+
+def get_embedding(word, lang):
+    if not isinstance(word, str) or word.strip() == "":
+        return np.zeros(300)
+
+    model = model_fr if lang.strip() == "french" else model_en
+
+    try:
+        return model[word]
+    except KeyError:
+        return np.zeros(300)
+    
+def calculate_avg_cosine(vector_list):
+    similarities = cosine_similarity(vector_list)
+    upper_triangle = similarities[np.triu_indices_from(similarities, k=1)]
+    return np.mean(upper_triangle)
+
+def scale_score(score, n_words=10):
+    max_score = 1 # all words the same
+    min_score = -1/(n_words-1) # -0.111 for 10 words
+
+    score_scaled = 0 + (score-max_score)*((0-10)/(max_score -min_score))
+    score_scaled = np.clip(score_scaled, 0, 10) # cheat a bit... this should not be needed
+    return int(np.round(score_scaled))
+
+def get_ranking(cosine_score):
+    df_cosine = pd.read_csv('./data/cosine_similairity_neigbor.csv', index_col=0)
+
+    df_llm = df_cosine[df_cosine['model'] != 'Human']
+    df_human = df_cosine[df_cosine['model'] == 'Human']
+
+    ranking_llm = (df_llm['avg_cosine'] > cosine_score).mean() * 100
+    ranking_human = (df_human['avg_cosine'] > cosine_score).mean() * 100
+
+    return ranking_llm, ranking_human
+            
 #-------------------------------------------------------
 # Calcul du score
 #-------------------------------------------------------
@@ -112,9 +154,44 @@ if user_input:
         pct_humans = percentile_rank(user_score, df_humans_lim["score"])
         pct_ai = percentile_rank(user_score, df_ai_grouped["score"])
 
-        st.success(f"""
-        🎯 Ton score : **{user_score}/10**
+        # Calculate cosine similairity
+        model_en = KeyedVectors.load("./models/wiki.multi.en.kv", mmap='r')
+        model_fr = KeyedVectors.load("./models/wiki.multi.fr.kv", mmap='r')
 
-        🤖 Meilleur que **{pct_ai:.1f}% des IA**  
-        🧑 Meilleur que **{pct_humans:.1f}% des humains**
-        """)
+        vector_list = [get_embedding(word, language) for word in words]
+        cosine_score = calculate_avg_cosine(vector_list)
+        cosine_scaled = scale_score(cosine_score)
+        ranking_llm, ranking_human = get_ranking(cosine_score)
+
+        if pct_ai > 50 : 
+            st.success(f"""
+            🎯 Ton score de orginalité : **{user_score}/10**
+
+            🤖 Meilleur que **{pct_ai:.1f}% des IA**  
+            🧑 Meilleur que **{pct_humans:.1f}% des humains**
+            """)
+            st.balloons()
+        else: 
+            st.error(f"""
+            🎯 Ton score de orginalité : **{user_score}/10**
+
+            🤖 Meilleur que **{pct_ai:.1f}% des IA**  
+            🧑 Meilleur que **{pct_humans:.1f}% des humains**
+            """)
+
+        if ranking_llm > 50 : 
+            st.success(f"""
+            🎯 Ton score de creativité : **{cosine_scaled}/10**
+
+            🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
+            🧑 Meilleur que **{ranking_human:.1f}% des humains**
+
+            """)
+            st.balloons()
+        else: 
+            st.error(f"""
+            🎯 Ton score de creativité : **{cosine_scaled}/10**
+
+            🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
+            🧑 Meilleur que **{ranking_human:.1f}% des humains**
+            """)
