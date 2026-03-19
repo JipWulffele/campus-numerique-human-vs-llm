@@ -7,7 +7,6 @@ So we toke 10 LLM to the test and avaluated their creativity and cultural bias.
 
 Clone the repo and see it for you self !
 
-
 ## Set-up (linux)
 
 1. Install git lfs if not installed 
@@ -35,8 +34,13 @@ Clone the repo and see it for you self !
     ```sh
     streamlit run app/app.py
     ```
+    
+## Data collection
 
-## Useful commands
+Thanks to everybody at the Campus Numerique in the Alpes for their participation !
+
+## Useful commands 
+
 Test tracked files and list lfs files
 ``` sh
 git lfs track
