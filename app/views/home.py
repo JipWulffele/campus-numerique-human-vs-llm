@@ -25,9 +25,12 @@ st.header("How to measure creativity and originality ?")
 st.subheader("Creativity : average pairwise cosine similairity")
 st.image("./data/cosine_explication.png")
 
-st.subheader("Orginality : frequency of rare words")
-# ADD EXPLICATION LAETITIA
-
+st.subheader("Originality : frequency of rare words")
+st.markdown("""
+The originality of your list of words is measured by checking how many of them appear in the most frequently used words in French or English.  
+Each dataset contains the 10,000 most common words.  
+The larger the subset of common words you consider, the harder it becomes to achieve a high originality score.
+""")
 
 st.header("Cultural bias")
 # ADD EXPLICATION DILETTA
