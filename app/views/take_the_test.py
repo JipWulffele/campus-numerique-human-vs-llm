@@ -204,7 +204,6 @@ if user_input:
                 🤖 Meilleur que **{pct_ai:.1f}% des IA**  
                 🧑 Meilleur que **{pct_humans:.1f}% des humains** 
                 """)
-                st.balloons()
 
         if ranking_llm and ranking_llm > 50 :
             if is_english:
@@ -224,7 +223,7 @@ if user_input:
 
                 """)
                 st.balloons()
-        elif ranking_llm: 
+        elif ranking_llm is not None: 
             if is_english:
                 st.error(f"""
                 🎯 Ton score de creativité : **{cosine_scaled}/10**
