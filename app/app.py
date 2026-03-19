@@ -13,8 +13,8 @@ model_page = st.Page("views/model.py", title="Model", icon=":material/settings:"
 
 # 2. Initialize Navigation
 pg = st.navigation({
-    "Main": [home_page],
-    "Tools": [take_the_test, creativity_page, rare_mots_page, culture_page, model_page]
+    "Main": [home_page, take_the_test],
+    "Results": [creativity_page, rare_mots_page, culture_page, model_page]
 })
 
 # 3. Run the navigation
