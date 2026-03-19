@@ -141,8 +141,14 @@ if user_input:
         #-------------------------------------------------------
         # Comparaison avec resultat dataset
         #-------------------------------------------------------
-        df_humans_lim = df_humans[df_humans["limit"] == selected_limit]
-        df_ai_lim = df_ai[df_ai["limit"] == selected_limit]
+        df_humans_lim = df_humans[
+            (df_humans["limit"] == selected_limit) & 
+            (df_humans["language"] == language)
+            ]
+        df_ai_lim = df_ai[
+            (df_ai["limit"] == selected_limit) &
+            (df_ai["language"] == language)
+            ]
         df_ai_grouped = df_ai_lim.groupby("model", as_index=False)["score"].mean()
 
         def percentile_rank(user_score, scores):
@@ -169,37 +175,70 @@ if user_input:
             ranking_llm, ranking_human = None, None
 
         if pct_ai > 50 : 
-            st.success(f"""
-            🎯 Ton score de orginalité : **{user_score}/10**
+            if is_english: 
+                st.success(f"""
+                🎯 Ton score de orginalité : **{user_score}/10**
 
-            🤖 Meilleur que **{pct_ai:.1f}% des IA**  
-            🧑 Meilleur que **{pct_humans:.1f}% des humains**
-            """)
-            st.balloons()
+                🤖 Meilleur que **{pct_ai:.1f}% des IA**  
+                """)
+                st.balloons()
+            else:
+                st.success(f"""
+                🎯 Ton score de orginalité : **{user_score}/10**
+
+                🤖 Meilleur que **{pct_ai:.1f}% des IA**  
+                🧑 Meilleur que **{pct_humans:.1f}% des humains**  
+                """)
+                st.balloons()
         else: 
-            st.error(f"""
-            🎯 Ton score de orginalité : **{user_score}/10**
+            if is_english:
+                st.error(f"""
+                🎯 Ton score de orginalité : **{user_score}/10**
 
-            🤖 Meilleur que **{pct_ai:.1f}% des IA**  
-            🧑 Meilleur que **{pct_humans:.1f}% des humains**
-            """)
+                🤖 Meilleur que **{pct_ai:.1f}% des IA**  
+                """)
+            else:
+                st.error(f"""
+                🎯 Ton score de orginalité : **{user_score}/10**
 
-        if ranking_llm and ranking_llm > 50 : 
-            st.success(f"""
-            🎯 Ton score de creativité : **{cosine_scaled}/10**
+                🤖 Meilleur que **{pct_ai:.1f}% des IA**  
+                🧑 Meilleur que **{pct_humans:.1f}% des humains** 
+                """)
+                st.balloons()
 
-            🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
-            🧑 Meilleur que **{ranking_human:.1f}% des humains**
+        if ranking_llm and ranking_llm > 50 :
+            if is_english:
+                st.success(f"""
+                🎯 Ton score de creativité : **{cosine_scaled}/10**
 
-            """)
-            st.balloons()
+                🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
+
+                """)
+                st.balloons()
+            else:
+                st.success(f"""
+                🎯 Ton score de creativité : **{cosine_scaled}/10**
+
+                🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
+                🧑 Meilleur que **{ranking_human:.1f}% des humains**
+
+                """)
+                st.balloons()
         elif ranking_llm: 
-            st.error(f"""
-            🎯 Ton score de creativité : **{cosine_scaled}/10**
+            if is_english:
+                st.error(f"""
+                🎯 Ton score de creativité : **{cosine_scaled}/10**
 
-            🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
-            🧑 Meilleur que **{ranking_human:.1f}% des humains**
-            """)
+                🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
+                """)
+            else:
+                st.error(f"""
+                🎯 Ton score de creativité : **{cosine_scaled}/10**
+
+                🤖 Meilleur que **{ranking_llm:.1f}% des IA**  
+                🧑 Meilleur que **{ranking_human:.1f}% des humains**
+                """)
+
         else: 
             st.warning(f"""
             Creativity score not available.\n
