@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import base64
+
+@st.cache_data
+def load_data():
+    df = pd.read_csv('./data/model-energy-2_11_2026.csv')#, index_col=0)
+    df.columns = df.columns.str.strip()
+    return df
 
 #st.set_page_config(layout="wide")
 
@@ -21,9 +28,9 @@ st.markdown("""Informations extract from:
 
 
 # --- Chargement données ---
-df_model = pd.read_csv('./data/model-energy-2_11_2026.csv')#, index_col=0)
+df_model = load_data()
 
-df_model.columns = df_model.columns.str.strip()
+
 
 # --- Mapping colonnes (à adapter si besoin) ---
 MODEL = "id"
@@ -33,6 +40,14 @@ SIZE = "Size"              # taille du modèle
 PARAM= "Parameters_B"
 ARCH = "Architecture"           # ex: transformer, moe...
 ORGA = "Organisation"
+
+# check columns
+required_cols = [MODEL, BT, ENERGY, PARAM, ARCH]
+
+missing = [c for c in required_cols if c not in df_model.columns]
+if missing:
+    st.error(f"Missing columns: {missing}")
+    st.stop()
 
 #st.write(df_model.columns.tolist())
 
@@ -143,15 +158,42 @@ with st.expander("📄 Voir les données filtrées"):
 with st.expander("📄 Voir les données non filtrées"):
     st.dataframe(df_model)
 
-with st.expander("📄 Aditional informations on Large Language Models model types"):
-    st.markdown("## additional informations")
-    st.markdown("### model type")
-    st.markdown("#### Dense")
-    st.markdown(" Think of a “standard”, Dense LLM model like a single, highly knowledgeable expert (or team) that tackles every single part of your request with its full brainpower. ")
-    st.markdown("#### MoE - Mixture of Experts")
-    st.markdown(" An LLM models that use router to select the most appropriate LLM taking in acount the training data of the LLM and the size of the model and the request")
-    st.markdown("#### MatFormer")
-    st.markdown(" extract of MoE models that has been resized without dooing a specific training")
+
+with st.expander("🧠 Model architectures explained"):
+    st.markdown("""
+### Dense
+A single large model that processes all tasks.
+
+👉 Simple but energy-intensive.""")
+    with open("./app/img/dense_model_architecture.svg", encoding="utf-8") as f:
+        svg_content = f.read()
+        st.components.v1.html(f"<div>{svg_content}</div>", height=800)
+
+    st.markdown("""            
+### Mixture of Experts (MoE)
+Only a subset of the model is activated per request.
+
+👉 More efficient for large-scale systems.""")
+    with open("./app/img/moe_mixture_of_experts_architecture.svg", encoding="utf-8") as f:
+        svg_content = f.read()
+        st.components.v1.html(f"<div>{svg_content}</div>", height=800)
+    
+    st.markdown("""
+### MatFormer
+A flexible architecture derived from transformers.
+
+👉 Designed for adaptive computation and efficiency.
+""")
+    with open("./app/img/matformer_nested_architecture.svg", encoding="utf-8") as f:
+        svg_content = f.read()
+        st.components.v1.html(f"<div>{svg_content}</div>", height=800)
+
+    # with st.expander("📄 shema"):
+    # with open("./app/views/matformer_nested_architecture.html", "r", encoding="utf-8") as f:
+    #     html_matformer = f.read()
+    # #st.html(html_matformer)
+    # st.components.v1.html(html_matformer, height=500, scrolling=False)
+    
     st.markdown("#### Ref")
     st.markdown("- https://maximilian-schwarzmueller.com/articles/understanding-mixture-of-experts-moe-llms/")
     st.markdown("- MatFormer - A nested Transformer Architecture for Elastic Inference - \n"
