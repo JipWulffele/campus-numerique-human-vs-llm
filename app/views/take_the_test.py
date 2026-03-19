@@ -5,7 +5,7 @@ from gensim.models import KeyedVectors
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-from views.rare_mots import compute_word_scores, clean_words, words_to_df
+from utils import clean_words, compute_word_scores, words_to_df
 
 #-------------------------------------------------------
 # load dictionnary
